@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Clock" ALTER COLUMN "stat" SET DATA TYPE TEXT;

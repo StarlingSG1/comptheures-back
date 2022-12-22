@@ -1,0 +1,50 @@
+{
+  "name": "comptheures-backend",
+  "description": "backend in typescript/nodejs - express with authentification",
+  "version": "1.0.0",
+  "engines": {
+    "node": "14.19.0"
+  },
+  "main": "./src/main.ts",
+  "scripts": {
+    "dev": "yarn nodemon",
+    "start": "yarn nodemon",
+    "build": "yarn prisma migrate deploy && yarn build:application",
+    "build:application": "yarn babel src/ --out-dir src/ --extensions \".ts\"",
+    "format": "yarn prettier --write \"src/**/*\""
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.14",
+    "@babel/core": "^7.13.14",
+    "@babel/node": "^7.13.13",
+    "@babel/preset-env": "^7.13.12",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.11",
+    "@types/node": "^14.14.37",
+    "nodemon": "^2.0.7",
+    "prettier": "^2.2.1",
+    "prisma": "^3.2.1",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.4.0",
+    "@types/node-mailjet": "^3.3.4",
+    "axios": "^0.21.1",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "heroku": "^7.60.2",
+    "jsonwebtoken": "^8.5.1",
+    "node-mailjet": "^3.3.1",
+    "passport": "^0.5.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "stripe": "^10.10.0",
+    "yarn": "^1.22.18"
+  }
+}

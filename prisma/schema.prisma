@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String @unique
+  password  String
+  role      Role   @default(USER)
+  clocks    Clock[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Clock{
+  id       String @id @default(uuid())
+  name      String
+  year      Int
+  month     Int
+  week      Int
+  day       Int
+  start     String
+  end       String
+  order     Int
+  type      Type  @default(WORK)
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  stats     Stats[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stats {
+  id        String @id @default(uuid())
+  work      String?
+  break     String?
+  clock     Clock @relation(fields: [clockId], references: [id], onDelete: Cascade)
+  clockId   String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER 
+  ADMIN
+  SUPERADMIN
+}
+
+enum Type {
+  WORK
+  BREAK
+}

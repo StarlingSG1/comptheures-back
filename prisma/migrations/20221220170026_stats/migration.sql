@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Stats" ALTER COLUMN "break" DROP NOT NULL,
+ALTER COLUMN "work" DROP NOT NULL;

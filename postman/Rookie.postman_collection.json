@@ -1,0 +1,474 @@
+{
+	"info": {
+		"_postman_id": "60c5cb72-fd42-4bab-a0cf-7576ebc587b1",
+		"name": "Rookie",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Get one user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/api/users/875e834d-6668-466e-8a1d-6f9e04f72fe6",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"875e834d-6668-466e-8a1d-6f9e04f72fe6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/api/users",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete one user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/api/users/:id",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "b98884ed-a4f1-4326-a55d-029a0ab3ea5f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"eMail\" : \"test@test.test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/api/users/875e834d-6668-466e-8a1d-6f9e04f72fe6",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"875e834d-6668-466e-8a1d-6f9e04f72fe6"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "authentification",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"TEST\",\n  \"lastName\": \"TEST\",\n  \"pseudo\": \"TEST\",\n  \"eMail\": \"string\",\n  \"password\": \"TEST\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/api/anthentification/register",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"api",
+								"anthentification",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"TEST\",\n  \"password\": \"TEST\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_URL}}/api/anthentification/login",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"api",
+								"anthentification",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "b&cConsulting",
+			"item": [
+				{
+					"name": "brands",
+					"item": [
+						{
+							"name": "Get all brands",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/brands/",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"brands",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get brands of one car",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/brands/:vehicule_id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"brands",
+										":vehicule_id"
+									],
+									"variable": [
+										{
+											"key": "vehicule_id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "models",
+					"item": [
+						{
+							"name": "Get all models of one brand",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/models/:brand_id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"models",
+										":brand_id"
+									],
+									"variable": [
+										{
+											"key": "brand_id",
+											"value": "11"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get details of one model of a brand",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/models/:brand_id/:model_id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"models",
+										":brand_id",
+										":model_id"
+									],
+									"variable": [
+										{
+											"key": "brand_id",
+											"value": "11"
+										},
+										{
+											"key": "model_id",
+											"value": "202"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "years",
+					"item": [
+						{
+							"name": "Get lists all modelyears for the requested model",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/years/:brand_id/:model_id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"years",
+										":brand_id",
+										":model_id"
+									],
+									"variable": [
+										{
+											"key": "brand_id",
+											"value": "11"
+										},
+										{
+											"key": "model_id",
+											"value": "202"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get the details of the modelyear requested",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/years/:brand_id/:model_id/:year_id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"years",
+										":brand_id",
+										":model_id",
+										":year_id"
+									],
+									"variable": [
+										{
+											"key": "brand_id",
+											"value": "11"
+										},
+										{
+											"key": "model_id",
+											"value": "202"
+										},
+										{
+											"key": "year_id",
+											"value": "203"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "powertrains",
+					"item": [
+						{
+							"name": "Get the lists all powertrains for the requested modelyear",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/powertrains/:brand_id/:model_id/:year_id/",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"powertrains",
+										":brand_id",
+										":model_id",
+										":year_id",
+										""
+									],
+									"variable": [
+										{
+											"key": "brand_id",
+											"value": "11"
+										},
+										{
+											"key": "model_id",
+											"value": "202"
+										},
+										{
+											"key": "year_id",
+											"value": "203"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get the details of the powertrain requested.",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{API_URL}}/api/consulting/powertrains/:brand_id/:model_id/:year_id/:powertrain_id",
+									"host": [
+										"{{API_URL}}"
+									],
+									"path": [
+										"api",
+										"consulting",
+										"powertrains",
+										":brand_id",
+										":model_id",
+										":year_id",
+										":powertrain_id"
+									],
+									"variable": [
+										{
+											"key": "brand_id",
+											"value": "11"
+										},
+										{
+											"key": "model_id",
+											"value": "202"
+										},
+										{
+											"key": "year_id",
+											"value": "203"
+										},
+										{
+											"key": "powertrain_id",
+											"value": "204"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRFU1QiLCJpZCI6Ijg3NWU4MzRkLTY2NjgtNDY2ZS04YTFkLTZmOWUwNGY3MmZlNiIsImlhdCI6MTYyNjU3MDMzNSwiZXhwIjoxNjI2NTczOTM1fQ.kTPloIzvSy-9SGYZVCgaoFH1vyy50MIs-lQl2KV8brg",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "API_URL",
+			"value": "http://localhost:8080"
+		}
+	]
+}
