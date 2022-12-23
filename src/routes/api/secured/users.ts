@@ -73,6 +73,7 @@ api.post("/update", async (req, res) => {
       });
     }
 
+    delete updatedUser.password;
 
     return res.status(201).json({error: false, data: {updatedUser, newToken} ,message: "Votre compte a été mis à jour avec succès"});
   } catch (err) {
