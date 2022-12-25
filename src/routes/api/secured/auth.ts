@@ -7,7 +7,6 @@ import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
 // import mailer from "../../../helpers/mailjet";
-import auth from "../../../middlewares/auth";
 
 const api = Router();
 
@@ -67,9 +66,10 @@ api.post("/register", async ({ body }, res) => {
 
     // mailer(email, firstName);
     // return new user
-    return res.status(201).json({ user });
+    return res.status(201).json({ error: false, data: user, message: "Création de votre compte réussi, vous pouvez vous connecter" });
   } catch (err) {
     console.log(err);
+    return res.status(400).json({ error: true, message: "Une erreure est survenue" });
   }
 });
 
