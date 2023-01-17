@@ -3,7 +3,7 @@ import http from 'http'
 import express from 'express'
 import cors from 'cors'
 import passport from 'passport'
-const PORT = process.env.PORT || 8084
+const PORT = process.env.PORT || 8184
 import { PrismaClient } from '@prisma/client'
 
 // Rest API
