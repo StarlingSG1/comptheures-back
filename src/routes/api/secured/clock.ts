@@ -272,7 +272,7 @@ api.post("/profile", async (req, res) => {
 });
 
 
-
+// get les items en fonction du premier jour et du dernier jour du mois (exemple du 28 (premier) au 27 (dernier))
 function filterByMonth(arr, day,month,firstDay,LastDay) {
   let items = [];
   console.log("day",day, "firstday", firstDay)
@@ -320,5 +320,78 @@ api.get("/test", async (req, res) => {
   }
 });
 
+// calculer la durée d'un item (heure de début / heure de fin de taff ou de pause)
+function calculateDuration(item) {
+  var start = new Date("1970-01-01T" + item.start + "Z");
+  var end = new Date("1970-01-01T" + item.end + "Z");
+  if (end < start) {
+    end.setMinutes(end.getMinutes() + 1440);
+  }
+  var duration = (end.getTime() - start.getTime()) / 1000 / 60 / 60;
+  if (duration < 0) {
+    duration += 24;
+  }
+  var hours = Math.floor(duration % 24);
+  var minutes = Math.round((duration % 1) * 60);
+  return `${hours}:${String(minutes).padStart(2, "0")}`;
+}
+
+api.get("/test2", async (req, res) => {
+  try {
+    var item = {type: 'work', start: '18:07', end : '08:12'};
+    var duration = calculateDuration(item);
+    res.status(200).json({ error: false, data: duration });
+  }
+  catch (err) {
+    console.log(err);
+  }
+});
+
+// Fais le total des items type:break, des items type:work et donne la diff pour avoir la durée de travail
+
+function calculateTotal(objects) {
+  var workTotal = 0;
+  var breakTotal = 0;
+  for (var i = 0; i < objects.length; i++) {
+    var [hours, minutes] = objects[i].time.split(':');
+    var duration = Number(hours) + Number(minutes) / 60;
+    if (objects[i].type === "work") {
+      workTotal += duration;
+    } else {
+      breakTotal += duration;
+    }
+  }
+  var diff = workTotal - breakTotal;
+  if (diff < 0) {
+    diff = 0;
+  }
+  var workTotalHour = Math.floor(workTotal);
+  var workTotalMinutes = Math.round((workTotal % 1) * 60);
+  var breakTotalHour = Math.floor(breakTotal);
+  var breakTotalMinutes = Math.round((breakTotal % 1) * 60);
+  var diffHour = Math.floor(diff);
+  var diffMinutes = Math.round((diff % 1) * 60);
+  return {workTotal: `${workTotalHour}:${String(workTotalMinutes).padStart(2, "0")}`, breakTotal: `${breakTotalHour}:${String(breakTotalMinutes).padStart(2, "0")}`, diff: `${diffHour}:${String(diffMinutes).padStart(2, "0")}`};
+}
+
+api.get("/test3", async (req, res) => {
+  try {
+    const objects = [
+      {type: "work", time: "08:30"},
+      {type: "break", time: "01:39"},
+      {type: "work", time: "06:15"},
+      {type: "break", time: "01:52"},
+      {type: "work", time: "04:00"},
+      {type: "break", time: "00:40"},
+      {type: "work", time: "09:00"},
+      {type: "break", time: "00:30"}
+    ];
+    var duration = calculateTotal(objects);
+    res.status(200).json({ error: false, data: duration });
+  }
+  catch (err) {
+    console.log(err);
+  }
+});
 
 export default api;
