@@ -12,6 +12,8 @@ import auth from "../../../middlewares/auth";
 const api = Router();
 
 
+
+
 function timeDiff(start, end) {
   const [startHour, startMinute] = start.split("h");
   const [endHour, endMinute] = end.split("h");
@@ -268,5 +270,55 @@ api.post("/profile", async (req, res) => {
     console.log(err);
   }
 });
+
+
+
+function filterByMonth(arr, day,month,firstDay,LastDay) {
+  let items = [];
+  console.log("day",day, "firstday", firstDay)
+  arr.filter(item => {
+    if (day >= firstDay) {
+      if (item.month === month && item.day >= firstDay) {
+        items.push(item)
+      }
+      else if (item.month === (month + 1) && item.day <= LastDay) {
+            items.push(item)
+        }
+    } else {
+        if (item.month === month && item.day <= LastDay) {
+            items.push(item)
+        }
+        else if (item.month === (month - 1) && item.day >= firstDay) {
+            items.push(item)
+        }
+    }
+  });
+  return items;
+}
+
+api.get("/test", async (req, res) => {
+  try {
+    const arr =[
+      {day: 1, month: 2, data: 5},
+      {day: 2, month: 2, data: 5},
+      {day: 3, month: 2, data: 5},
+      {day: 4, month: 2, data: 5},
+      {day: 5, month: 2, data: 5},
+      {day: 27, month: 1, data: 5},
+      {day: 28, month: 1, data: 5},
+      {day: 29, month: 1, data: 5},
+      {day: 30, month: 1, data: 5},
+      {day: 30, month: 3, data: 5},
+      {day: 30, month: 5, data: 5},
+      {day: 28, month: 5, data: 5},
+    ]
+    const value = filterByMonth(arr,29, 4, 28, 27)
+    res.status(200).json({ error: false, data: value });
+  }
+  catch (err) {
+    console.log(err);
+  }
+});
+
 
 export default api;
