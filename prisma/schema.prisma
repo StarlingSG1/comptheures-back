@@ -17,35 +17,111 @@ model User {
   email     String @unique
   password  String
   role      Role   @default(USER)
-  clocks    Clock[]
+  userEnterprise UserEnterprise?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Clock{
+model Enterprise {
+  id        String @id @default(uuid()) 
+  name      String
+  adress    String
+  email     String
+  phone     String
+  website   String
+  configEnterprise ConfigEnterprise?
+  Users     UserEnterprise[]
+  RoleEnterprise RoleEnterprise[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserEnterprise {
+  id        String @id @default(uuid())
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String @unique
+  enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  enterpriseId String
+  role     RoleEnterprise @relation(fields: [roleEnterpriseId], references: [id], onDelete: Cascade)
+  roleEnterpriseId String
+  Stats    Stats[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RoleEnterprise {
+  id        String @id @default(uuid())
+  label     String @unique
+  isAdmin   Int  @default(0)     // 0 -> user normal | 1 -> admin | 2 -> superAdmin (comme le créateur de l'entreprise)
+  userEnterprise UserEnterprise[]
+  enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  enterpriseId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConfigEnterprise {
+  id       String @id @default(uuid())
+  monthDayStart Int @default(1)  // jour de début du mois
+  monthDayEnd   Int @default(31) // jour de fin du mois
+  workHourADay  Int @default(7)  // nombre d'heure de travail par jour
+  SpecialDays   SpecialDay[]
+  enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  enterpriseId String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SpecialDay {
+  id       String @id @default(uuid())
+  name     String
+  work    Boolean @default(true) // true -> jour travaillé | false -> jour non travaillé
+  paid    Boolean @default(true) // true -> jour payé | false -> jour non payé
+  configEnterprise ConfigEnterprise @relation(fields: [configEnterpriseId], references: [id])
+  configEnterpriseId String
+  specialTime SpecialTime[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SpecialTime{
+  id      String @id @default(uuid())
+  name     String  
+  specialDay SpecialDay @relation(fields: [specialDayId], references: [id])
+  specialDayId String
+  workHourADay String
+  stats     Stats?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CustomTime{
   id       String @id @default(uuid())
   name      String
-  year      Int
-  month     Int
-  week      Int
-  day       Int
-  start     String
-  end       String
+  start     String // 09:00 
+  end       String // 17:00
   order     Int
   type      Type  @default(WORK)
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  stats     Stats[]
+  stats     Stats @relation(fields: [statsId], references: [id], onDelete: Cascade)
+  statsId   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Stats {
   id        String @id @default(uuid())
-  work      String?
-  break     String?
-  clock     Clock @relation(fields: [clockId], references: [id], onDelete: Cascade)
-  clockId   String @unique
+  year      Int
+  month     Int
+  week      Int
+  day       Int 
+  work      String? // temps de travail - les breaks
+  break     String? 
+  realisationStatus RealisationStatus @default(IN_VALIDATION)
+  CustomTime     CustomTime[]
+  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id])
+  specialTimeId String? @unique
+  userEnterprise UserEnterprise @relation(fields: [userEnterpriseId], references: [id], onDelete: Cascade)
+  userEnterpriseId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -59,4 +135,10 @@ enum Role {
 enum Type {
   WORK
   BREAK
+}
+
+enum RealisationStatus {
+  IN_VALIDATION
+  VALIDATED
+  REFUSED
 }
