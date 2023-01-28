@@ -185,5 +185,49 @@ api.post("/reset-password/:token", async ({ params , body}, res) => {
   }
 });
 
+// get all userEnterprise bhy enterprise id 
+api.get("/enterprise/:id", async ( req, res) => {
+  try {
+    // verify user role
+    const user = req.user;
+    const { id } = req.params;
+    // get userEnterprise where userId = user.id and enterpriseId = id
+    const enterpriseAdmin = await prisma.userEnterprise.findUnique({
+      where: {
+          userId: user.id,
+      },
+      include: {
+        user: true,
+        role: true,
+      },
+    });
+
+    console.log(enterpriseAdmin)
+
+
+    if(enterpriseAdmin.role.isAdmin !== 1 && enterpriseAdmin.role.isAdmin !== 2) {
+      return res.status(401).json({ error: true, message: "Vous n'avez pas les droits pour accéder à cette page" });
+    }
+
+    if(enterpriseAdmin.role.isAdmin === 1 || enterpriseAdmin.role.isAdmin === 2) {
+      const userEnterprise = await prisma.userEnterprise.findMany({
+        where: {
+          enterpriseId: id,
+        },
+        include: {
+          user: true,
+          role: true,
+          Stats: true,
+        },
+      });
+      return res.status(200).json({ error: false, data: userEnterprise });
+    }
+    
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
 
 export default api;
