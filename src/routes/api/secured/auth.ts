@@ -91,6 +91,20 @@ api.post("/login", async (req, res) => {
       where: {
         email: email,
       },
+      include: {
+        userEnterprise: {
+          include: {
+            enterprise: true,
+            role: true,
+            Stats: {
+              include: {
+                CustomTime: true,
+                specialTime: true,
+              },
+            },
+        },
+      },
+      }
     });
     
     if (!user) {
@@ -127,6 +141,20 @@ api.post("/me", async ({body}, res) => {
       where: {
         id: decoded.id,
       },
+      include: {
+        userEnterprise: {
+          include: {
+            enterprise: true,
+            role: true,
+            Stats: {
+              include: {
+                CustomTime: true,
+                specialTime: true,
+              },
+            },
+        },
+      },
+      }
     });
     delete user.password;
     res.status(200).send({error: false, user: user});

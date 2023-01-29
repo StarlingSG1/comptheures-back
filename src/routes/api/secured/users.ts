@@ -217,7 +217,12 @@ api.get("/enterprise/:id", async ( req, res) => {
         include: {
           user: true,
           role: true,
-          Stats: true,
+          Stats: {
+            include: {
+              CustomTime: true,
+              specialTime: true,
+            },
+          },
         },
       });
       return res.status(200).json({ error: false, data: userEnterprise });
