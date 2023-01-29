@@ -18,6 +18,11 @@ const verifyIsAdmin = async (id: string, res) => {
         include: {
             user: true,
             role: true,
+            enterprise: {
+                include : {
+                    configEnterprise: true,
+                }
+            },
         },
     });
 
@@ -87,5 +92,30 @@ api.post("/update", async (req, res) => {
     }
 });
 
+// get all specialDays of the enterprise
+api.get("/specialDays", async (req, res) => {
+    try {
+        const user = req?.user;
+
+        const adminUser = await verifyIsAdmin(user.id, res);
+        const specialDays = await prisma.specialDay.findMany({
+            where: {
+                configEnterpriseId: adminUser.enterprise.configEnterprise.id,
+            },
+            include: {
+                configEnterprise: true,
+                specialTime: {
+                    include: {
+                        stats: true,
+                    },
+                },
+            },
+        });
+        return res.status(200).json({ error: false, data: specialDays });
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
 
 export default api;

@@ -64,7 +64,7 @@ model ConfigEnterprise {
   id       String @id @default(uuid())
   monthDayStart Int @default(1)  // jour de début du mois
   monthDayEnd   Int @default(31) // jour de fin du mois
-  workHourADay  Int @default(7)  // nombre d'heure de travail par jour
+  workHourADay  String @default("07:00")  // nombre d'heure de travail par jour
   SpecialDays   SpecialDay[]
   enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
   enterpriseId String @unique

@@ -160,15 +160,15 @@ api.get("/", async (req, res) => {
   // Our login logic starts here
   try {
     // get all clock where userId = req.user.id
-    const clocks = await prisma.clock.findMany({
-      where: {
-        userId: req.user.id,
-      },
-      include: {
-        stats: true,
-      },
-    });
-    res.status(200).json({ error: false, data: clocks });
+    // const clocks = await prisma.clock.findMany({
+    //   where: {
+    //     userId: req.user.id,
+    //   },
+    //   include: {
+    //     stats: true,
+    //   },
+    // });
+    res.status(200).json({ error: false, data: [] });
   } catch (err) {
     console.log(err);
   }
@@ -270,6 +270,7 @@ api.post("/profile", async (req, res) => {
     console.log(err);
   }
 });
+
 
 
 // get les items en fonction du premier jour et du dernier jour du mois (exemple du 28 (premier) au 27 (dernier))
