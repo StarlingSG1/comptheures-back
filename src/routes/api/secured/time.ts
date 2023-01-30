@@ -57,15 +57,17 @@ api.post("/create", async (req, res) => {
                 month: req.body.data.month,
                 year: req.body.data.year,
                 week: req.body.data.week,
+                userEnterpriseId: userFinded.userEnterprise.id,
+            },
+            include: {
+                CustomTime: true,
+                specialTime: true,
             },
         })
 
-        if (statExist) {
-            // faire un update
-            return console.log("la stats existe déjà")
-        }
 
         if(timeType === "SPECIAL") {
+
             const specialTime = {
                 name: req.body.data.name,
                 specialDayId: req.body.data.id,
@@ -80,30 +82,89 @@ api.post("/create", async (req, res) => {
                 }
             })
 
-            const stat = await prisma.stats.create({
-                data: {
-                    day: req.body.data.day,
-                    month: req.body.data.month,
-                    year: req.body.data.year,
-                    week: req.body.data.week,
-                    specialTimeId: specialTimeCreated.id,
-                    work: req.body.data.configEnterprise.workHourADay,
-                    userEnterpriseId: userFinded.userEnterprise.id,
+            if (statExist) {
+
+                const stat = await prisma.stats.update({
+                    where: {
+                        id: statExist.id,
+                    },
+                    data: {
+                        specialTimeId: specialTimeCreated.id,
+                    },
+                })
+
+                if(statExist.specialTimeId) {
+                    const specialTimeDeleted = await prisma.specialTime.delete({
+                        where: {
+                            id: statExist.specialTimeId,
+                        },
+                    })
                 }
-            })
+
+                if(statExist.CustomTime.length){
+                    const customTimeDeleted = await prisma.customTime.deleteMany({
+                        where: {
+                            statsId: statExist.id,
+                        },
+                    })
+                }
+
+            }else {
+                const stat = await prisma.stats.create({
+                    data: {
+                        day: req.body.data.day,
+                        month: req.body.data.month,
+                        year: req.body.data.year,
+                        week: req.body.data.week,
+                        specialTimeId: specialTimeCreated.id,
+                        work: req.body.data.configEnterprise.workHourADay,
+                        userEnterpriseId: userFinded.userEnterprise.id,
+                    }
+                })
+            }
         }
 
         if(timeType === "AUTO") {
-            const stat = await prisma.stats.create({
-                data: {
-                    day: req.body.data.day,
-                    month: req.body.data.month,
-                    year: req.body.data.year,
-                    week: req.body.data.week,
-                    work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
-                    userEnterpriseId: userFinded.userEnterprise.id,
+           
+            if (statExist) {
+
+                const stat = await prisma.stats.update({
+                    where: {
+                        id: statExist.id,
+                    },
+                    data: {
+                        work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
+                    },
+                })
+
+                if(statExist.specialTimeId) {
+                    const specialTimeDeleted = await prisma.specialTime.delete({
+                        where: {
+                            id: statExist.specialTimeId,
+                        },
+                    })
                 }
-            })
+
+                if(statExist.CustomTime.length){
+                    const customTimeDeleted = await prisma.customTime.deleteMany({
+                        where: {
+                            statsId: statExist.id,
+                        },
+                    })
+                }
+
+            }else {
+                const stat = await prisma.stats.create({
+                    data: {
+                        day: req.body.data.day,
+                        month: req.body.data.month,
+                        year: req.body.data.year,
+                        week: req.body.data.week,
+                        work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
+                        userEnterpriseId: userFinded.userEnterprise.id,
+                    }
+                })    
+            }
 
         }
 
@@ -121,7 +182,25 @@ api.post("/create", async (req, res) => {
             // })
         }
 
-        return res.status(200).json({ error: false, message: "La journée a bien été créée" });
+        const stats = await prisma.stats.findMany({
+            where: {
+                userEnterpriseId: userFinded.userEnterprise.id,
+            },
+            include: {
+                CustomTime: true,
+                specialTime: {
+                    include : {
+                        specialDay: {
+                            include: {
+                                configEnterprise: true
+                            },
+                        },
+                    }
+                },
+            },
+        })
+
+        return res.status(200).json({ error: false, data: stats, message: "La journée a bien été créée" });
     }
     catch (err) {
         console.log(err);
