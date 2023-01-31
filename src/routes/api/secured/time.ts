@@ -16,7 +16,6 @@ const api = Router();
 api.post("/create", async (req, res) => {
     try {
 
-        console.log(req.body)
         const user = req?.user;
         const timeType = req.body.type
 
@@ -169,7 +168,6 @@ api.post("/create", async (req, res) => {
                     }
                 })
             }
-
         }
 
         if (timeType === "CUSTOM") {
