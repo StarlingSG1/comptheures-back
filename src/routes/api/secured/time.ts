@@ -8,6 +8,7 @@ import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
 import { calculateDuration, calculateTotal } from "../../../helpers/timeCalculation";
 import { time } from "console";
+import { getUserFinded } from "../../../helpers/userFunctions";
 // import mailer from "../../../helpers/mailjet";
 
 const api = Router();
@@ -20,38 +21,8 @@ api.post("/create", async (req, res) => {
         const timeType = req.body.type
 
         // get user where id = user.id
-        const userFinded = await prisma.user.findUnique({
-            where: {
-                id: user.id,
-            },
-            include: {
-                userEnterprise: {
-                    include: {
-                        enterprise:
-                        {
-                            include: {
-                                configEnterprise: {
-                                    include: {
-                                        SpecialDays: {
-                                            include: {
-                                                configEnterprise: true
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                        },
-                        role: true,
-                        Stats: {
-                            include: {
-                                CustomTime: true,
-                                specialTime: true,
-                            },
-                        },
-                    },
-                },
-            },
-        })
+       
+        const userFinded = await getUserFinded(user)
 
         // verify is a Stats item exist
         const statExist = await prisma.stats.findFirst({
@@ -310,13 +281,16 @@ api.post("/create", async (req, res) => {
                 },
             },
         })
-
         return res.status(200).json({ error: false, data: stats, message: "La journée a bien été créée" });
     }
     catch (err) {
-        console.log(err);
+            (err);
         return res.status(500).json({ error: true, message: "Une erreur est survenue" });
     }
 });
+
+
+// delete a stat
+
 
 export default api;
