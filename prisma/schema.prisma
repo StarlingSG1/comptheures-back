@@ -115,10 +115,10 @@ model Stats {
   week      Int
   day       Int 
   work      String? // temps de travail - les breaks
-  break     String? 
+  break     String? // peut etre pas utilie finalement
   realisationStatus RealisationStatus @default(IN_VALIDATION)
   CustomTime     CustomTime[]
-  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id], onDelete: Cascade)
+  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id])
   specialTimeId String? @unique
   userEnterprise UserEnterprise @relation(fields: [userEnterpriseId], references: [id], onDelete: Cascade)
   userEnterpriseId String

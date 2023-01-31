@@ -15,6 +15,8 @@ const api = Router();
 // create a specialTime
 api.post("/create", async (req, res) => {
     try {
+
+        console.log(req.body)
         const user = req?.user;
         const timeType = req.body.type
 
@@ -68,7 +70,7 @@ api.post("/create", async (req, res) => {
         })
 
 
-        if(timeType === "SPECIAL") {
+        if (timeType === "SPECIAL") {
 
             const specialTime = {
                 name: req.body.data.name,
@@ -95,7 +97,7 @@ api.post("/create", async (req, res) => {
                     },
                 })
 
-                if(statExist.specialTimeId) {
+                if (statExist.specialTimeId) {
                     const specialTimeDeleted = await prisma.specialTime.delete({
                         where: {
                             id: statExist.specialTimeId,
@@ -103,7 +105,7 @@ api.post("/create", async (req, res) => {
                     })
                 }
 
-                if(statExist.CustomTime.length){
+                if (statExist.CustomTime.length) {
                     const customTimeDeleted = await prisma.customTime.deleteMany({
                         where: {
                             statsId: statExist.id,
@@ -111,7 +113,7 @@ api.post("/create", async (req, res) => {
                     })
                 }
 
-            }else {
+            } else {
                 const stat = await prisma.stats.create({
                     data: {
                         day: req.body.data.day,
@@ -126,8 +128,8 @@ api.post("/create", async (req, res) => {
             }
         }
 
-        if(timeType === "AUTO") {
-           
+        if (timeType === "AUTO") {
+
             if (statExist) {
 
                 const stat = await prisma.stats.update({
@@ -139,7 +141,7 @@ api.post("/create", async (req, res) => {
                     },
                 })
 
-                if(statExist.specialTimeId) {
+                if (statExist.specialTimeId) {
                     const specialTimeDeleted = await prisma.specialTime.delete({
                         where: {
                             id: statExist.specialTimeId,
@@ -147,7 +149,7 @@ api.post("/create", async (req, res) => {
                     })
                 }
 
-                if(statExist.CustomTime.length){
+                if (statExist.CustomTime.length) {
                     const customTimeDeleted = await prisma.customTime.deleteMany({
                         where: {
                             statsId: statExist.id,
@@ -155,7 +157,7 @@ api.post("/create", async (req, res) => {
                     })
                 }
 
-            }else {
+            } else {
                 const stat = await prisma.stats.create({
                     data: {
                         day: req.body.data.day,
@@ -165,42 +167,42 @@ api.post("/create", async (req, res) => {
                         work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
                         userEnterpriseId: userFinded.userEnterprise.id,
                     }
-                })    
+                })
             }
 
         }
 
-        if(timeType === "CUSTOM") {
+        if (timeType === "CUSTOM") {
             const items = req.body.data.times
             const times = []
             items.forEach((time, index) => {
-                if(time.start !== "" || time.end !== ""){
+                if (time.start !== "" || time.end !== "") {
                     times.push(time)
                 }
             })
-            
-            if(times.length === 0 ){
-                if(statExist){
+
+            if (times.length === 0) {
+                if (statExist) {
 
                     const stat = await prisma.stats.delete({
                         where: {
                             id: statExist.id,
                         },
                     })
-                }else{
-                    return res.status(200).json({error: true, message: "Il faut ajouter un horaire"})
+                } else {
+                    return res.status(200).json({ error: true, message: "Il faut ajouter un horaire" })
                 }
             }
 
-            if(statExist){
-                
+            if (statExist) {
+
                 const customTimeDeleted = await prisma.customTime.deleteMany({
                     where: {
                         statsId: statExist.id,
                     },
                 })
 
-                if(statExist.specialTimeId) {
+                if (statExist.specialTimeId) {
                     const specialTimeDeleted = await prisma.specialTime.delete({
                         where: {
                             id: statExist.specialTimeId,
@@ -219,7 +221,7 @@ api.post("/create", async (req, res) => {
                         statsId: statExist.id,
                     })),
                 })
-                
+
                 // get all customTime where statsId = statExist.id
                 const customTimeFinded = await prisma.customTime.findMany({
                     where: {
@@ -229,8 +231,8 @@ api.post("/create", async (req, res) => {
                 // FAIRE LA somme / calcul des heures pour le work/break de la stat
                 let myTimes = []
                 customTimeFinded.forEach((time) => {
-                const calc = calculateDuration(time)
-                myTimes.push({type: time.type, time: calc})
+                    const calc = calculateDuration(time)
+                    myTimes.push({ type: time.type, time: calc })
                 })
 
                 const totalResult = calculateTotal(myTimes)
@@ -244,7 +246,7 @@ api.post("/create", async (req, res) => {
                         work: totalResult.diff,
                     },
                 })
-            } else{
+            } else {
 
                 const stat = await prisma.stats.create({
                     data: {
@@ -266,7 +268,7 @@ api.post("/create", async (req, res) => {
                         statsId: stat.id,
                     })),
                 })
-                
+
                 const customTimeFinded = await prisma.customTime.findMany({
                     where: {
                         statsId: stat.id,
@@ -275,8 +277,8 @@ api.post("/create", async (req, res) => {
 
                 let myTimes = []
                 customTimeFinded.forEach((time) => {
-                const calc = calculateDuration(time)
-                myTimes.push({type: time.type, time: calc})
+                    const calc = calculateDuration(time)
+                    myTimes.push({ type: time.type, time: calc })
                 })
                 const totalResult = calculateTotal(myTimes)
 
@@ -300,7 +302,7 @@ api.post("/create", async (req, res) => {
             include: {
                 CustomTime: true,
                 specialTime: {
-                    include : {
+                    include: {
                         specialDay: {
                             include: {
                                 configEnterprise: true
