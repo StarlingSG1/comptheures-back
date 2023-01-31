@@ -87,7 +87,7 @@ model SpecialDay {
 model SpecialTime{
   id      String @id @default(uuid())
   name     String  
-  specialDay SpecialDay @relation(fields: [specialDayId], references: [id])
+  specialDay SpecialDay @relation(fields: [specialDayId], references: [id], onDelete: Cascade)
   specialDayId String
   workHourADay String
   stats     Stats?
@@ -118,7 +118,7 @@ model Stats {
   break     String? 
   realisationStatus RealisationStatus @default(IN_VALIDATION)
   CustomTime     CustomTime[]
-  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id])
+  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id], onDelete: Cascade)
   specialTimeId String? @unique
   userEnterprise UserEnterprise @relation(fields: [userEnterpriseId], references: [id], onDelete: Cascade)
   userEnterpriseId String
