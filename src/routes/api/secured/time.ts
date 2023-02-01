@@ -21,7 +21,7 @@ api.post("/create", async (req, res) => {
         const timeType = req.body.type
 
         // get user where id = user.id
-       
+
         const userFinded = await getUserFinded(user)
 
         // verify is a Stats item exist
@@ -158,109 +158,111 @@ api.post("/create", async (req, res) => {
                             id: statExist.id,
                         },
                     })
+                    console.log(times)
                 } else {
                     return res.status(200).json({ error: true, message: "Il faut ajouter un horaire" })
                 }
-            }
-
-            if (statExist) {
-
-                const customTimeDeleted = await prisma.customTime.deleteMany({
-                    where: {
-                        statsId: statExist.id,
-                    },
-                })
-
-                if (statExist.specialTimeId) {
-                    const specialTimeDeleted = await prisma.specialTime.delete({
-                        where: {
-                            id: statExist.specialTimeId,
-                        },
-                    })
-                }
-
-                // create a customTime for each item in times and add statsId = statExist.id
-                const customTime = await prisma.customTime.createMany({
-                    data: times.map((time) => ({
-                        name: time.name,
-                        type: time.type,
-                        order: time.order,
-                        start: time.start,
-                        end: time.end,
-                        statsId: statExist.id,
-                    })),
-                })
-
-                // get all customTime where statsId = statExist.id
-                const customTimeFinded = await prisma.customTime.findMany({
-                    where: {
-                        statsId: statExist.id,
-                    },
-                })
-                // FAIRE LA somme / calcul des heures pour le work/break de la stat
-                let myTimes = []
-                customTimeFinded.forEach((time) => {
-                    const calc = calculateDuration(time)
-                    myTimes.push({ type: time.type, time: calc })
-                })
-
-                const totalResult = calculateTotal(myTimes)
-
-                // update stats where id = statExist.id
-                const stat = await prisma.stats.update({
-                    where: {
-                        id: statExist.id,
-                    },
-                    data: {
-                        work: totalResult.diff,
-                    },
-                })
             } else {
 
-                const stat = await prisma.stats.create({
-                    data: {
-                        day: req.body.data.day,
-                        month: req.body.data.month,
-                        year: req.body.data.year,
-                        week: req.body.data.week,
-                        userEnterpriseId: userFinded.userEnterprise.id,
+                if (statExist) {
+
+                    const customTimeDeleted = await prisma.customTime.deleteMany({
+                        where: {
+                            statsId: statExist.id,
+                        },
+                    })
+
+                    if (statExist.specialTimeId) {
+                        const specialTimeDeleted = await prisma.specialTime.delete({
+                            where: {
+                                id: statExist.specialTimeId,
+                            },
+                        })
                     }
-                })
 
-                const customTime = await prisma.customTime.createMany({
-                    data: times.map((time) => ({
-                        name: time.name,
-                        type: time.type,
-                        order: time.order,
-                        start: time.start,
-                        end: time.end,
-                        statsId: stat.id,
-                    })),
-                })
+                    // create a customTime for each item in times and add statsId = statExist.id
+                    const customTime = await prisma.customTime.createMany({
+                        data: times.map((time) => ({
+                            name: time.name,
+                            type: time.type,
+                            order: time.order,
+                            start: time.start,
+                            end: time.end,
+                            statsId: statExist.id,
+                        })),
+                    })
 
-                const customTimeFinded = await prisma.customTime.findMany({
-                    where: {
-                        statsId: stat.id,
-                    },
-                })
+                    // get all customTime where statsId = statExist.id
+                    const customTimeFinded = await prisma.customTime.findMany({
+                        where: {
+                            statsId: statExist.id,
+                        },
+                    })
+                    // FAIRE LA somme / calcul des heures pour le work/break de la stat
+                    let myTimes = []
+                    customTimeFinded.forEach((time) => {
+                        const calc = calculateDuration(time)
+                        myTimes.push({ type: time.type, time: calc })
+                    })
 
-                let myTimes = []
-                customTimeFinded.forEach((time) => {
-                    const calc = calculateDuration(time)
-                    myTimes.push({ type: time.type, time: calc })
-                })
-                const totalResult = calculateTotal(myTimes)
+                    const totalResult = calculateTotal(myTimes)
 
-                const updatedStat = await prisma.stats.update({
-                    where: {
-                        id: stat.id,
-                    },
-                    data: {
-                        work: totalResult.diff,
-                    },
-                })
-                // faire la somme / soustractions des heures et update le work/break de la stats
+                    // update stats where id = statExist.id
+                    const stat = await prisma.stats.update({
+                        where: {
+                            id: statExist.id,
+                        },
+                        data: {
+                            work: totalResult.diff,
+                        },
+                    })
+                } else {
 
+                    const stat = await prisma.stats.create({
+                        data: {
+                            day: req.body.data.day,
+                            month: req.body.data.month,
+                            year: req.body.data.year,
+                            week: req.body.data.week,
+                            userEnterpriseId: userFinded.userEnterprise.id,
+                        }
+                    })
+
+                    const customTime = await prisma.customTime.createMany({
+                        data: times.map((time) => ({
+                            name: time.name,
+                            type: time.type,
+                            order: time.order,
+                            start: time.start,
+                            end: time.end,
+                            statsId: stat.id,
+                        })),
+                    })
+
+                    const customTimeFinded = await prisma.customTime.findMany({
+                        where: {
+                            statsId: stat.id,
+                        },
+                    })
+
+                    let myTimes = []
+                    customTimeFinded.forEach((time) => {
+                        const calc = calculateDuration(time)
+                        myTimes.push({ type: time.type, time: calc })
+                    })
+                    const totalResult = calculateTotal(myTimes)
+
+                    const updatedStat = await prisma.stats.update({
+                        where: {
+                            id: stat.id,
+                        },
+                        data: {
+                            work: totalResult.diff,
+                        },
+                    })
+                    // faire la somme / soustractions des heures et update le work/break de la stats
+
+                }
             }
         }
 
@@ -284,7 +286,7 @@ api.post("/create", async (req, res) => {
         return res.status(200).json({ error: false, data: stats, message: "La journée a bien été créée" });
     }
     catch (err) {
-            (err);
+        (err);
         return res.status(500).json({ error: true, message: "Une erreur est survenue" });
     }
 });
