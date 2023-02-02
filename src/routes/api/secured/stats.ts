@@ -7,9 +7,12 @@ import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
 import { getUserFinded, getUserStats } from "../../../helpers/userFunctions";
+import { calculateTotal, calculateTotalRecap, filterByMonth, getDaysOfTheWeek } from "../../../helpers/timeCalculation";
 // import mailer from "../../../helpers/mailjet";
 
 const api = Router();
+
+
 
 // get all stats of the user 
 api.get("/", async (req, res) => {
@@ -26,7 +29,7 @@ api.get("/", async (req, res) => {
             include: {
                 CustomTime: true,
                 specialTime: {
-                    include : {
+                    include: {
                         specialDay: {
                             include: {
                                 configEnterprise: true
@@ -36,8 +39,24 @@ api.get("/", async (req, res) => {
                 },
             },
         })
+        const value = filterByMonth(stats, 30, 0, 2023, 28, 27)
 
-        res.status(200).json({ error: false, data: stats, message: "Les stats ont bien été récupérées" });
+        const newValue = calculateTotalRecap(value)
+        const myRecap = {
+            month: {
+                start: 28,
+                end: 27,
+                total: newValue.workTotal,
+                length: value.length,
+            },
+            week: {
+                start: 1,
+                end: 7,
+                total: "X",
+                length: "X",
+            }
+        }
+        res.status(200).json({ error: false, data: { stats: stats, recap: myRecap }, message: "Les stats ont bien été récupérées" });
 
     }
     catch (error) {
@@ -45,6 +64,95 @@ api.get("/", async (req, res) => {
         res.status(400).json({ error: "Une erreur est survenue" });
     }
 });
+
+api.post("/recap", async (req, res) => {
+    try {
+        const user = req?.user;
+        const date = req.body
+        const userFinded = await getUserFinded(user)
+
+        const stats = await prisma.stats.findMany({
+            where: {
+                userEnterpriseId: userFinded.userEnterprise.id,
+            },
+            include: {
+                CustomTime: true,
+                specialTime: {
+                    include: {
+                        specialDay: {
+                            include: {
+                                configEnterprise: true
+                            },
+                        },
+                    }
+                },
+            },
+        })
+        const value = filterByMonth(stats, date.day, date.month, date.year, userFinded.userEnterprise.enterprise.configEnterprise.monthDayStart, userFinded.userEnterprise.enterprise.configEnterprise.monthDayEnd)
+
+        const daysWeek = getDaysOfTheWeek(new Date(date.year, date.month, date.day))
+
+        let weekFormated = []
+        let firstAndLastDayOfTheWeek = []
+        for (let i = 0; daysWeek.resultat.length > i; i++) {
+            let givenDate = daysWeek.resultat[i];
+
+            if(daysWeek.day !== 0 && daysWeek.day !== 6){
+                givenDate = new Date(givenDate.getTime() - 86400000);
+            }
+            if (i === 0 || i === 6) {
+                firstAndLastDayOfTheWeek.push(givenDate)
+            }
+            const theStat = await prisma.stats.findFirst({
+                where: {
+                    day: givenDate.getDate(),
+                    month: givenDate.getMonth(),
+                    year: givenDate.getFullYear(),
+                    userEnterpriseId: userFinded.userEnterprise.id,
+                },
+                include: {
+                    CustomTime: true,
+                    specialTime: {
+                        include: {
+                            specialDay: {
+                                include: {
+                                    configEnterprise: true
+                                },
+                            },
+                        }
+                    },
+                },
+            })
+            if (theStat) {
+                weekFormated.push(theStat)
+            }
+        }
+
+        const weekValue = calculateTotalRecap(weekFormated)
+        const newValue = calculateTotalRecap(value)
+        const myRecap = {
+            month: {
+                start: userFinded.userEnterprise.enterprise.configEnterprise.monthDayStart,
+                end: userFinded.userEnterprise.enterprise.configEnterprise.monthDayEnd,
+                total: newValue.workTotal,
+                length: value.length,
+            },
+            week: {
+                start: {number : firstAndLastDayOfTheWeek[0].getDate()},
+                end: {number : firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getDate()},
+                total: weekValue.workTotal,
+                length: weekFormated.length,
+            }
+        }
+        return res.status(200).json({ error: false, data: { stats: stats, recap: myRecap }, message: "Les stats ont bien été récupérées" });
+
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ error: "Une erreur est survenue" });
+    }
+});
+
 
 
 api.post("/delete", async (req, res) => {
@@ -75,7 +183,7 @@ api.post("/delete", async (req, res) => {
     }
 });
 
-    
+
 
 
 export default api;
