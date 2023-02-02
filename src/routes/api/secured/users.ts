@@ -202,7 +202,6 @@ api.get("/enterprise/:id", async ( req, res) => {
       },
     });
 
-    console.log(enterpriseAdmin)
 
 
     if(enterpriseAdmin.role.isAdmin !== 1 && enterpriseAdmin.role.isAdmin !== 2) {

@@ -52,35 +52,41 @@ export function calculateDuration(item) {
     return `${hours}:${String(minutes).padStart(2, "0")}`;
 }
 
-export function filterByMonth(arr, day, month, year, firstDay, LastDay) {
+export function filterByMonth(arr, day, month, year, firstDay, lastDay) {
   let items = [];
   arr.filter(item => {
+
+    if(firstDay < lastDay) {
+      if(item.month === month && item.year === year && item.day >= firstDay && item.day <= lastDay){
+        items.push(item)
+      }
+    }else{
     if (day >= firstDay) {
       if (month === 11) {
         if (item.month === month && item.year === year && item.day >= firstDay) {
           items.push(item)
         }
-        else if (item.month === 0 && item.year === year && item.day <= LastDay) {
+        else if (item.month === 0 && item.year === year && item.day <= lastDay) {
           items.push(item)
         }
       } else {
         if (item.month === month && item.year === year && item.day >= firstDay) {
           items.push(item)
         }
-        else if (item.month === (month + 1) && item.year === year && item.day <= LastDay) {
+        else if (item.month === (month + 1) && item.year === year && item.day <= lastDay) {
           items.push(item)
         }
       }
     } else {
       if (month === 0) {
-        if (item.month === month && item.year === year && item.day <= LastDay) {
+        if (item.month === month && item.year === year && item.day <= lastDay) {
           items.push(item)
         }
         else if (item.month === 11 && item.year === year && item.day >= firstDay) {
           items.push(item)
         }
       } else {
-        if (item.month === month && item.year === year && item.day <= LastDay) {
+        if (item.month === month && item.year === year && item.day <= lastDay) {
           items.push(item)
         }
         else if (item.month === (month - 1) && item.year === year && item.day >= firstDay) {
@@ -88,6 +94,7 @@ export function filterByMonth(arr, day, month, year, firstDay, LastDay) {
         }
       }
     }
+  }
   });
   return items;
 }
@@ -121,7 +128,6 @@ export function getDaysOfTheWeek(date) {
   const joursSemaine = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
   const indexJour = joursSemaine.indexOf(date.toLocaleString('fr-FR', { weekday: 'long' }).toLowerCase());
   const resultat = [];
-  console.log(date.toLocaleString('fr-FR', { weekday: 'long' }).toLowerCase())
 
   if (indexJour === 0) {
     for (let i = 0; i < 7; i++) {

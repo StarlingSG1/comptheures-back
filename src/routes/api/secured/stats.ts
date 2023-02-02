@@ -89,7 +89,6 @@ api.post("/recap", async (req, res) => {
             },
         })
         const value = filterByMonth(stats, date.day, date.month, date.year, userFinded.userEnterprise.enterprise.configEnterprise.monthDayStart, userFinded.userEnterprise.enterprise.configEnterprise.monthDayEnd)
-
         const daysWeek = getDaysOfTheWeek(new Date(date.year, date.month, date.day))
 
         let weekFormated = []
@@ -138,8 +137,8 @@ api.post("/recap", async (req, res) => {
                 length: value.length,
             },
             week: {
-                start: {number : firstAndLastDayOfTheWeek[0].getDate()},
-                end: {number : firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getDate()},
+                start: {number : firstAndLastDayOfTheWeek[0].getDate(), month: firstAndLastDayOfTheWeek[0].getMonth()},
+                end: {number : firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getDate(), month: firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getMonth()},
                 total: weekValue.workTotal,
                 length: weekFormated.length,
             }
