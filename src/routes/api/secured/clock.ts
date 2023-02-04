@@ -251,29 +251,6 @@ api.post("/", async (req, res) => {
   }
 });
 
-api.post("/profile", async (req, res) => {
-  try {
-    const user = req?.user;
-    const { month, year } = req.body;
-    const clocks = await prisma.clock.findMany({
-      where: {
-        userId: user.id,
-        month: month,
-        year: year,
-        type: "WORK"
-      },
-      include: {
-        stats: true,
-      },
-    });
-    return res.status(200).json({ error: false, data: clocks, message: "Comptheures pour le mois et l'année récupéré" });
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-
-
 // get les items en fonction du premier jour et du dernier jour du mois (exemple du 28 (premier) au 27 (dernier))
 function filterByMonth(arr, day, month, year, firstDay, LastDay) {
   let items = [];

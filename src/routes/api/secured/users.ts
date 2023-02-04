@@ -24,7 +24,7 @@ api.post("/update", async (req, res) => {
 
     // Validate user input
     if (!(email && firstName && lastName)) {
-      return res.status(400).send("All input is required");
+      return res.status(400).send("All input are required");
     }
 
     // check if user already exist
@@ -49,6 +49,34 @@ api.post("/update", async (req, res) => {
         lastName: ucwords(lastName),
         email: email.toLowerCase(),
       },
+      include: {
+        userEnterprise: {
+          include: {
+            enterprise:
+            {
+              include: {
+                configEnterprise: {
+                  include: {
+                    SpecialDays: {
+                      include: {
+                        configEnterprise: true
+                      }
+                    },
+                  }
+                },
+              },
+            },
+            role: true,
+            Stats: {
+              include: {
+                CustomTime: true,
+                specialTime: true,
+              },
+            },
+          },
+        },
+      }
+
     });
 
     // Create token
