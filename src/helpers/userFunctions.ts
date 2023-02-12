@@ -21,6 +21,7 @@ export async function getUserFinded(user){
                                     },
                                 }
                             },
+                            createdBy: true,
                         },
                     },
                     role: true,

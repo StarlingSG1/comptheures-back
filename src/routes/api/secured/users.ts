@@ -7,6 +7,7 @@ import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
 import { mailerReset } from "../../../helpers/mailjet";
+import { getUserFinded } from "../../../helpers/userFunctions";
 
 
 const api = Router();
@@ -40,7 +41,7 @@ api.post("/update", async (req, res) => {
       }
     }
 
-    const updatedUser = await prisma.user.update({
+    const userUpdated = await prisma.user.update({
       where: {
         id: user.id,
       },
@@ -64,6 +65,7 @@ api.post("/update", async (req, res) => {
                     },
                   }
                 },
+                createdBy: true,
               },
             },
             role: true,
@@ -81,7 +83,7 @@ api.post("/update", async (req, res) => {
 
     // Create token
     const newToken = jwt.sign(
-      { id: updatedUser.id, email: updatedUser.email },
+      { id: userUpdated.id, email: userUpdated.email },
       process.env.TOKEN_SECRET,
       {
         expiresIn: "2h",
@@ -89,11 +91,11 @@ api.post("/update", async (req, res) => {
     );
 
     if(password.old && password.new && password.confirm) {
-      // if password.old === updatedUser.password
+      // if password.old === userUpdated.password
       const encryptedPassword = await bcrypt.hash(password.new, 10);
       await prisma.user.update({
         where: {
-          id: updatedUser.id,
+          id: userUpdated.id,
         },
         data: {
           password: encryptedPassword,
@@ -101,7 +103,9 @@ api.post("/update", async (req, res) => {
       });
     }
 
-    delete updatedUser.password;
+    delete userUpdated.password;
+
+    const updatedUser = getUserFinded(userUpdated);
 
     return res.status(201).json({error: false, data: {updatedUser, newToken} ,message: "Votre compte a été mis à jour avec succès"});
   } catch (err) {
@@ -249,6 +253,9 @@ api.get("/enterprise/:id", async ( req, res) => {
               CustomTime: true,
               specialTime: true,
             },
+            orderBy: {
+              createdAt: 'desc',
+            },
           },
         },
       });
@@ -259,6 +266,8 @@ api.get("/enterprise/:id", async ( req, res) => {
     console.log(err);
   }
 });
+
+
 
 
 

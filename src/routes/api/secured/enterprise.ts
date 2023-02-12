@@ -6,6 +6,7 @@ dotenv.config();
 import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
+import { getUserFinded } from "../../../helpers/userFunctions";
 // import mailer from "../../../helpers/mailjet";
 
 const api = Router();
@@ -19,7 +20,7 @@ const verifyIsAdmin = async (id: string, res) => {
             user: true,
             role: true,
             enterprise: {
-                include : {
+                include: {
                     configEnterprise: true,
                 }
             },
@@ -67,25 +68,7 @@ api.post("/update", async (req, res) => {
         });
 
         // get user where id = user.id
-        const userUpdater = await prisma.user.findUnique({
-            where: {
-                id: user.id,
-            },
-            include: {
-                userEnterprise: {
-                    include: {
-                        enterprise: true,
-                        role: true,
-                        Stats: {
-                            include: {
-                                CustomTime: true,
-                                specialTime: true,
-                            },
-                        },
-                    },
-                },
-            }
-        });
+        const userUpdater = userFinded(user.id);
         return res.status(200).json({ error: false, data: userUpdater, message: "Les informations de l'entreprise ont été mises à jour avec succès" });
     } catch (err) {
         console.log(err);
@@ -114,6 +97,52 @@ api.get("/specialDays", async (req, res) => {
         return res.status(200).json({ error: false, data: specialDays });
     }
     catch (err) {
+        console.log(err);
+    }
+});
+
+api.post("/users/delete", async (req, res) => {
+    try {
+
+        const userFinded = await getUserFinded(req.user)
+
+        if (userFinded.userEnterprise.role.isAdmin < 2){
+            return res.status(401).json({ error: true, message: "Vous n'avez pas les droits pour accéder à cette page" });
+        }
+
+        const { usersIds, enterpriseId } = req.body;
+        // delete all userEnterprise where userId in usersIds
+        const deleted =await prisma.userEnterprise.deleteMany({
+            where: {
+                id: {
+                    in: usersIds,
+                },
+            },
+        });
+        
+        // get all users of the enterprise 
+        const userEnterprise = await prisma.userEnterprise.findMany({
+            where: {
+              enterpriseId: enterpriseId,
+            },
+            include: {
+              user: true,
+              role: true,
+              Stats: {
+                include: {
+                  CustomTime: true,
+                  specialTime: true,
+                },
+                orderBy: {
+                  createdAt: 'desc',
+                },
+              },
+            },
+          });
+
+        return res.status(200).json({ error: false,data : userEnterprise, message: "Les utilisateurs ont été supprimés avec succès" });
+
+    } catch (err) {
         console.log(err);
     }
 });

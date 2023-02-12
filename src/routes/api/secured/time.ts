@@ -20,11 +20,10 @@ api.post("/create", async (req, res) => {
         const user = req?.user;
         const timeType = req.body.type
 
-        // get user where id = user.id
-
         const userFinded = await getUserFinded(user)
 
-        // verify is a Stats item exist
+        const userRole = userFinded.userEnterprise.role.isAdmin
+
         const statExist = await prisma.stats.findFirst({
             where: {
                 day: req.body.data.day,
@@ -64,6 +63,7 @@ api.post("/create", async (req, res) => {
                     },
                     data: {
                         specialTimeId: specialTimeCreated.id,
+                        ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                     },
                 })
 
@@ -93,6 +93,7 @@ api.post("/create", async (req, res) => {
                         specialTimeId: specialTimeCreated.id,
                         work: req.body.data.configEnterprise.workHourADay,
                         userEnterpriseId: userFinded.userEnterprise.id,
+                        ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                     }
                 })
             }
@@ -108,6 +109,7 @@ api.post("/create", async (req, res) => {
                     },
                     data: {
                         work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
+                        ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                     },
                 })
 
@@ -136,6 +138,7 @@ api.post("/create", async (req, res) => {
                         week: req.body.data.week,
                         work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
                         userEnterpriseId: userFinded.userEnterprise.id,
+                        ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                     }
                 })
             }
@@ -214,6 +217,7 @@ api.post("/create", async (req, res) => {
                         },
                         data: {
                             work: totalResult.diff,
+                            ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                         },
                     })
                 } else {
@@ -225,6 +229,7 @@ api.post("/create", async (req, res) => {
                             year: req.body.data.year,
                             week: req.body.data.week,
                             userEnterpriseId: userFinded.userEnterprise.id,
+                            ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                         }
                     })
 
@@ -258,6 +263,7 @@ api.post("/create", async (req, res) => {
                         },
                         data: {
                             work: totalResult.diff,
+                            ...(userRole === 2 && { realisationStatus: "VALIDATED" })
                         },
                     })
                     // faire la somme / soustractions des heures et update le work/break de la stats
@@ -291,6 +297,96 @@ api.post("/create", async (req, res) => {
     }
 });
 
+api.post("/status/update", async (req, res) => {
+    try {
+        const userFinded = await getUserFinded(req.user);
+        const userRole = userFinded.userEnterprise.role.isAdmin;
+
+        if(userRole < 1 ){
+            return res.status(401).json({ error: true, message: "Vous n'avez pas les droits d'effectuer cette action" });
+        }
+
+        const stats = req.body.data
+        const option = req.body.option
+
+        if(option === "VALIDATED"){
+            // foreach stat in stats, update realisationStatus to VALIDATED
+            for(let i = 0; i < stats.length; i++){
+                const statUpdated = await prisma.stats.update({
+                    where: {
+                        id: stats[i].id,
+                    },
+                    data: {
+                        realisationStatus: "VALIDATED",
+                    },
+                })
+            }
+            
+
+            // get all stats where realisationStatus = IN_VALIDATION and userEnterpriseId = userFinded.userEnterprise.id
+            const statsFinded = await prisma.stats.findMany({
+                where: {
+                    realisationStatus: "IN_VALIDATION",
+                    userEnterpriseId: userFinded.userEnterprise.id,
+                },
+                include: {
+                    CustomTime: true,
+                    specialTime: {
+                        include: {
+                            specialDay: {
+                                include: {
+                                    configEnterprise: true 
+                                },
+                            },
+                        }
+                    },
+                },
+            })
+
+            return res.status(200).json({ error: false, data: statsFinded, message: "Les jours ont bien été validés" });
+            
+        } else if(option === "REFUSED"){
+            // foreach stat in stats, update realisationStatus to REJECTED
+            for(let i = 0; i < stats.length; i++){
+                const statUpdated = await prisma.stats.update({
+                    where: {
+                        id: stats[i].id,
+                    },
+                    data: {
+                        realisationStatus: "REFUSED",
+                    },
+                })
+            }
+
+            const statsFinded = await prisma.stats.findMany({
+                where: {
+                    realisationStatus: "IN_VALIDATION",
+                    userEnterpriseId: userFinded.userEnterprise.id,
+                },
+                include: {
+                    CustomTime: true,
+                    specialTime: {
+                        include: {
+                            specialDay: {
+                                include: {
+                                    configEnterprise: true 
+                                },
+                            },
+                        }
+                    },
+                },
+            })
+        
+            return res.status(200).json({ error: false, data: statsFinded, message: "Les jours ont bien été refusé" });
+        }
+
+
+
+    } catch (err) {
+        (err);
+        return res.status(500).json({ error: true, message: "Une erreur est survenue" });
+    }
+});
 
 // delete a stat
 
