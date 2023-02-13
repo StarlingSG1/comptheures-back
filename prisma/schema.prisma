@@ -84,6 +84,18 @@ model SpecialDay {
   configEnterprise ConfigEnterprise @relation(fields: [configEnterpriseId], references: [id])
   configEnterpriseId String
   specialTime SpecialTime[]
+  defaultSpecialDay DefaultSpecialDay? @relation(fields: [defaultSpecialDayId], references: [id])
+  defaultSpecialDayId String? @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DefaultSpecialDay{
+  id       String @id @default(uuid())
+  name     String
+  work    Boolean @default(true) // true -> jour travaillé | false -> jour non travaillé
+  paid    Boolean @default(true) // true -> jour payé | false -> jour non payé
+  SpecialDay   SpecialDay[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
