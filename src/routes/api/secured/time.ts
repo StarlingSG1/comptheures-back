@@ -63,7 +63,7 @@ api.post("/create", async (req, res) => {
                     },
                     data: {
                         specialTimeId: specialTimeCreated.id,
-                        ...(userRole === 2 && { realisationStatus: "VALIDATED" })
+                        ...(userRole === 2 ? { realisationStatus: "VALIDATED" } : { realisationStatus: "IN_VALIDATION" })
                     },
                 })
 
@@ -109,7 +109,7 @@ api.post("/create", async (req, res) => {
                     },
                     data: {
                         work: userFinded.userEnterprise.enterprise.configEnterprise.workHourADay,
-                        ...(userRole === 2 && { realisationStatus: "VALIDATED" })
+                        ...(userRole === 2 ? { realisationStatus: "VALIDATED" } : { realisationStatus: "IN_VALIDATION" })
                     },
                 })
 
@@ -217,7 +217,7 @@ api.post("/create", async (req, res) => {
                         },
                         data: {
                             work: totalResult.diff,
-                            ...(userRole === 2 && { realisationStatus: "VALIDATED" })
+                            ...(userRole === 2 ? { realisationStatus: "VALIDATED" } : { realisationStatus: "IN_VALIDATION" })
                         },
                     })
                 } else {

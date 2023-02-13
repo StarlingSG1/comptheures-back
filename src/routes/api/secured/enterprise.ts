@@ -6,7 +6,7 @@ dotenv.config();
 import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
-import { getUserFinded } from "../../../helpers/userFunctions";
+import { getUserEnterprise, getUserFinded } from "../../../helpers/userFunctions";
 // import mailer from "../../../helpers/mailjet";
 
 const api = Router();
@@ -22,6 +22,7 @@ const verifyIsAdmin = async (id: string, res) => {
             enterprise: {
                 include: {
                     configEnterprise: true,
+                    RoleEnterprise: true,
                 }
             },
         },
@@ -67,9 +68,10 @@ api.post("/update", async (req, res) => {
             },
         });
 
+        const updatedEnterprise = await getUserEnterprise(adminUser.enterpriseId);
+
         // get user where id = user.id
-        const userUpdater = getUserFinded(user.id);
-        return res.status(200).json({ error: false, data: userUpdater, message: "Les informations de l'entreprise ont été mises à jour avec succès" });
+        return res.status(200).json({ error: false, data: updatedEnterprise, message: "Les informations de l'entreprise ont été mises à jour avec succès" });
     } catch (err) {
         console.log(err);
     }
@@ -276,23 +278,8 @@ api.post("/config", async (req, res) => {
         }
 
 
-        const configedEnterprise = await prisma.enterprise.findUnique({
-            where: {
-                id: adminUser.enterpriseId,
-            },
-            include: {
-                configEnterprise: {
-                    include: {
-                        SpecialDays: {
-                            include: {
-                                configEnterprise: true
-                            }
-                        },
-                    }
-                },
-                createdBy: true,
-            },
-        });
+        const configedEnterprise = await getUserEnterprise(adminUser.enterpriseId);
+        console.log(configedEnterprise)
 
         return res.status(200).json({ error: false, data: configedEnterprise, message: "La configuration a été mise à jour avec succès" });
 

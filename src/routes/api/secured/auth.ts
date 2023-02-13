@@ -106,6 +106,7 @@ api.post("/login", async (req, res) => {
                     },
                   }
                 },
+                RoleEnterprise: true,
                 createdBy: true,
               },
             },
@@ -170,6 +171,7 @@ api.post("/me", async ({ body }, res) => {
                     },
                   }
                 },
+                RoleEnterprise: true,
                 createdBy: true,
               },
             },

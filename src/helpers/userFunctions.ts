@@ -1,6 +1,6 @@
 import prisma from "./prisma";
 
-export async function getUserFinded(user){
+export async function getUserFinded(user) {
 
     const userFinded = await prisma.user.findUnique({
         where: {
@@ -40,7 +40,7 @@ export async function getUserFinded(user){
 }
 
 // getUserStats
-export async function getUserStats(user){
+export async function getUserStats(user) {
 
     const stats = await prisma.stats.findMany({
         where: {
@@ -62,3 +62,48 @@ export async function getUserStats(user){
 
     return stats
 }
+
+export async function getUserEnterprise(id) {
+
+    const enterprise = await prisma.enterprise.findUnique({
+        where: {
+            id: id,
+        },
+        include: {
+            configEnterprise: {
+                include: {
+                    SpecialDays: {
+                        include: {
+                            configEnterprise: true,
+                            specialTime : {
+                                include: {
+                                    stats: true,
+                                },
+                            },
+                            defaultSpecialDay: {
+                                include: {
+                                    SpecialDay: true,
+                                    configEnterprise: true
+                                }
+                            },
+                        }
+                    },
+                    enterprise: true,
+                    DefaultSpecialDays: {
+                        include: {
+                            SpecialDay: true,
+                            configEnterprise: true
+                        }
+                    },
+
+                    
+                }
+            },
+            RoleEnterprise: true,
+            createdBy: true,
+            
+        },
+    })
+
+    return enterprise
+    }

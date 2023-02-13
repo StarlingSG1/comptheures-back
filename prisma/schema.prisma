@@ -72,6 +72,7 @@ model ConfigEnterprise {
   SpecialDays   SpecialDay[]
   enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
   enterpriseId String @unique
+  DefaultSpecialDays DefaultSpecialDay[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -96,6 +97,8 @@ model DefaultSpecialDay{
   work    Boolean @default(true) // true -> jour travaillé | false -> jour non travaillé
   paid    Boolean @default(true) // true -> jour payé | false -> jour non payé
   SpecialDay   SpecialDay[]
+  configEnterprise ConfigEnterprise? @relation(fields: [configEnterpriseId], references: [id], onDelete: Cascade)
+  configEnterpriseId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
