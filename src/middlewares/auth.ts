@@ -71,6 +71,11 @@ export function verifyAdmin(req, res, next){
           userEnterprise: {
             include: {
             role: true,
+            enterprise: {
+              include : {
+                configEnterprise: true, 
+              }
+            },
             },
           },
         },

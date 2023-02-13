@@ -7,7 +7,6 @@ import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
 import { calculateDuration, calculateTotal } from "../../../helpers/timeCalculation";
-import { time } from "console";
 import { getUserFinded } from "../../../helpers/userFunctions";
 // import mailer from "../../../helpers/mailjet";
 
@@ -19,9 +18,7 @@ api.post("/create", async (req, res) => {
 
         const user = req?.user;
         const timeType = req.body.type
-
         const userFinded = await getUserFinded(user)
-
         const userRole = userFinded.userEnterprise.role.isAdmin
 
         const statExist = await prisma.stats.findFirst({
@@ -37,7 +34,6 @@ api.post("/create", async (req, res) => {
                 specialTime: true,
             },
         })
-
 
         if (timeType === "SPECIAL") {
 
@@ -161,7 +157,6 @@ api.post("/create", async (req, res) => {
                             id: statExist.id,
                         },
                     })
-                    console.log(times)
                 } else {
                     return res.status(200).json({ error: true, message: "Il faut ajouter un horaire" })
                 }

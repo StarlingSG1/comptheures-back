@@ -102,7 +102,10 @@ api.post("/login", async (req, res) => {
                     SpecialDays: {
                       include: {
                         configEnterprise: true
-                      }
+                      },
+                      orderBy: {
+                        createdAt: "asc",
+                      },
                     },
                   }
                 },
@@ -167,7 +170,10 @@ api.post("/me", async ({ body }, res) => {
                     SpecialDays: {
                       include: {
                         configEnterprise: true
-                      }
+                      },
+                      orderBy: {
+                        createdAt: "asc",
+                      },
                     },
                   }
                 },

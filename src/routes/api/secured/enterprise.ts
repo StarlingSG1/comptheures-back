@@ -36,7 +36,7 @@ const verifyIsAdmin = async (id: string, res) => {
 }
 
 // route to update enterprise informations 
-api.post("/update", async (req, res) => {
+api.post("/update", async ({user, body}, res) => {
     try {
         const {
             name,
@@ -44,9 +44,9 @@ api.post("/update", async (req, res) => {
             email,
             phone,
             website
-        } = req.body;
+        } = body;
 
-        const user = req?.user;
+        
 
         // Validate user input
         if (!(name && email && address && phone && website)) {
@@ -68,7 +68,7 @@ api.post("/update", async (req, res) => {
             },
         });
 
-        const updatedEnterprise = await getUserEnterprise(adminUser.enterpriseId);
+        const updatedEnterprise = await getUserEnterprise(adminUser.enterpriseId, user);
 
         // get user where id = user.id
         return res.status(200).json({ error: false, data: updatedEnterprise, message: "Les informations de l'entreprise ont été mises à jour avec succès" });
@@ -78,9 +78,8 @@ api.post("/update", async (req, res) => {
 });
 
 // get all specialDays of the enterprise
-api.get("/specialDays", async (req, res) => {
+api.get("/specialDays", async ({user, body}, res) => {
     try {
-        const user = req?.user;
 
         const adminUser = await verifyIsAdmin(user.id, res);
         const specialDays = await prisma.specialDay.findMany({
@@ -103,16 +102,16 @@ api.get("/specialDays", async (req, res) => {
     }
 });
 
-api.post("/users/delete", async (req, res) => {
+api.post("/users/delete", async ({user, body}, res) => {
     try {
 
-        const userFinded = await getUserFinded(req.user)
+        const userFinded = await getUserFinded(user)
 
         if (userFinded.userEnterprise.role.isAdmin < 2) {
             return res.status(401).json({ error: true, message: "Vous n'avez pas les droits pour accéder à cette page" });
         }
 
-        const { usersIds, enterpriseId } = req.body;
+        const { usersIds, enterpriseId } = body;
         // delete all userEnterprise where userId in usersIds
         const deleted = await prisma.userEnterprise.deleteMany({
             where: {
@@ -149,10 +148,8 @@ api.post("/users/delete", async (req, res) => {
     }
 });
 
-api.get("/specialDays/default", async (req, res) => {
+api.get("/specialDays/default", async ({user, body}, res) => {
     try {
-        const user = req?.user;
-
         // get all default specialDays
         const specialDays = await prisma.defaultSpecialDay.findMany();
         return res.status(200).json({ error: false, data: specialDays });
@@ -161,13 +158,12 @@ api.get("/specialDays/default", async (req, res) => {
     }
 });
 
-api.post("/config", async (req, res) => {
+api.post("/config", async ({user, body}, res) => {
     try {
-        const user = req?.user;
 
         const adminUser = await verifyIsAdmin(user.id, res);
 
-        const { months, specialDays, time } = req.body;
+        const { months, specialDays, time } = body;
         const specialDaysIds = [];
 
         specialDays.forEach((specialDay) => {
@@ -212,8 +208,6 @@ api.post("/config", async (req, res) => {
                 }
             });
 
-
-
             // update configEnterprise
             await prisma.configEnterprise.update({
                 where: {
@@ -249,10 +243,7 @@ api.post("/config", async (req, res) => {
                     },
                 })
             }
-
-
         } else {
-
             const configCreated = await prisma.configEnterprise.create({
                 data: {
                     enterpriseId: adminUser.enterpriseId,
@@ -278,8 +269,7 @@ api.post("/config", async (req, res) => {
         }
 
 
-        const configedEnterprise = await getUserEnterprise(adminUser.enterpriseId);
-        console.log(configedEnterprise)
+        const configedEnterprise = await getUserEnterprise(adminUser.enterpriseId, adminUser);
 
         return res.status(200).json({ error: false, data: configedEnterprise, message: "La configuration a été mise à jour avec succès" });
 

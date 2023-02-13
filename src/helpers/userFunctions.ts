@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import prisma from "./prisma";
 
 export async function getUserFinded(user) {
@@ -63,8 +64,7 @@ export async function getUserStats(user) {
     return stats
 }
 
-export async function getUserEnterprise(id) {
-
+export async function getUserEnterprise(id: string, userEnterprise) {
     const enterprise = await prisma.enterprise.findUnique({
         where: {
             id: id,
@@ -90,13 +90,14 @@ export async function getUserEnterprise(id) {
                     },
                     enterprise: true,
                     DefaultSpecialDays: {
+                        where: {
+                            configEnterpriseId: (null || userEnterprise?.enterprise?.configEnterprise?.id),
+                        },
                         include: {
                             SpecialDay: true,
                             configEnterprise: true
                         }
                     },
-
-                    
                 }
             },
             RoleEnterprise: true,

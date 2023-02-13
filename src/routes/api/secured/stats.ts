@@ -32,7 +32,17 @@ api.get("/", async (req, res) => {
                     include: {
                         specialDay: {
                             include: {
-                                configEnterprise: true
+                                configEnterprise: true,
+                                defaultSpecialDay: {
+                                    include: {
+                                        SpecialDay: true,
+                                    },
+                                },
+                                specialTime: {
+                                    include: {
+                                        stats: true,
+                                    },
+                                },
                             },
                         },
                     }
