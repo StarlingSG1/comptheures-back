@@ -85,7 +85,7 @@ model SpecialDay {
   configEnterprise ConfigEnterprise @relation(fields: [configEnterpriseId], references: [id])
   configEnterpriseId String
   specialTime SpecialTime[]
-  defaultSpecialDay DefaultSpecialDay? @relation(fields: [defaultSpecialDayId], references: [id])
+  defaultSpecialDay DefaultSpecialDay? @relation(fields: [defaultSpecialDayId], references: [id], onDelete: Cascade)
   defaultSpecialDayId String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
