@@ -61,9 +61,12 @@ api.post("/update", async (req, res) => {
                     SpecialDays: {
                       include: {
                         configEnterprise: true
-                      }
+                      },
+                      orderBy: {
+                        createdAt: "desc",
+                      },
                     },
-                  }
+                  },
                 },
                 createdBy: true,
               },

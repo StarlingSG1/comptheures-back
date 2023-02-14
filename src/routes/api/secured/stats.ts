@@ -75,15 +75,47 @@ api.get("/", async (req, res) => {
     }
 });
 
+const getMonthRange = (date) => {
+    const month = date.month;
+    const year = date.year;
+    const prevMonth = (month === 0) ? 11 : month - 1;
+    const nextMonth = (month === 11) ? 0 : month + 1;
+    const prevYear = (prevMonth === 11) ? year - 1 : year;
+    const nextYear = (nextMonth === 0) ? year + 1 : year;
+    return {
+        previous: new Date(prevYear, prevMonth),
+        current: new Date(year, month),
+        next: new Date(nextYear, nextMonth),
+    };
+}
+
 api.post("/recap", async (req, res) => {
     try {
         const user = req?.user;
         const date = req.body
         const userFinded = await getUserFinded(user)
 
+        const range = getMonthRange(date);
+        const months = [range.previous.getMonth(), range.current.getMonth(), range.next.getMonth()];
+        const years = [range.previous.getFullYear(), range.current.getFullYear(), range.next.getFullYear()];       
+
         const stats = await prisma.stats.findMany({
             where: {
                 userEnterpriseId: userFinded.userEnterprise.id,
+                OR: [
+                    {
+                        month: months[0],
+                        year: years[0],
+                    },
+                    {
+                        month: months[1],
+                        year: years[1],
+                    },
+                    {
+                        month: months[2],
+                        year: years[2],
+                    },
+                ],
             },
             include: {
                 CustomTime: true,
@@ -98,6 +130,7 @@ api.post("/recap", async (req, res) => {
                 },
             },
         })
+
         const value = filterByMonth(stats, date.day, date.month, date.year, userFinded.userEnterprise.enterprise.configEnterprise.monthDayStart, userFinded.userEnterprise.enterprise.configEnterprise.monthDayEnd)
         const daysWeek = getDaysOfTheWeek(new Date(date.year, date.month, date.day))
 
@@ -106,7 +139,7 @@ api.post("/recap", async (req, res) => {
         for (let i = 0; daysWeek.resultat.length > i; i++) {
             let givenDate = daysWeek.resultat[i];
 
-            if(daysWeek.day !== 0 && daysWeek.day !== 6){
+            if (daysWeek.day !== 0 && daysWeek.day !== 6) {
                 givenDate = new Date(givenDate.getTime() - 86400000);
             }
             if (i === 0 || i === 6) {
@@ -147,8 +180,8 @@ api.post("/recap", async (req, res) => {
                 length: value.length,
             },
             week: {
-                start: {number : firstAndLastDayOfTheWeek[0].getDate(), month: firstAndLastDayOfTheWeek[0].getMonth()},
-                end: {number : firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getDate(), month: firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getMonth()},
+                start: { number: firstAndLastDayOfTheWeek[0].getDate(), month: firstAndLastDayOfTheWeek[0].getMonth() },
+                end: { number: firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getDate(), month: firstAndLastDayOfTheWeek[firstAndLastDayOfTheWeek.length - 1].getMonth() },
                 total: weekValue.workTotal,
                 length: weekFormated.length,
             }

@@ -56,6 +56,7 @@ export async function getUserStats(user) {
                             configEnterprise: true
                         },
                     },
+                    
                 }
             },
         },
