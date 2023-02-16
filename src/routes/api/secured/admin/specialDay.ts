@@ -27,7 +27,7 @@ api.post("/create", async ({ user, body }, res) => {
 
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: true, message: "Une erreure est survenue" });
+    return res.status(400).json({ error: true, message: "Une erreur est survenue" });
   }
 });
 

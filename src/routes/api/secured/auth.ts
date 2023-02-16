@@ -69,7 +69,7 @@ api.post("/register", async ({ body }, res) => {
     return res.status(201).json({ error: false, data: user, message: "Création de votre compte réussi, vous pouvez vous connecter" });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: true, message: "Une erreure est survenue" });
+    return res.status(400).json({ error: true, message: "Une erreur est survenue" });
   }
 });
 
