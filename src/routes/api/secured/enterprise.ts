@@ -22,7 +22,11 @@ const verifyIsAdmin = async (id: string, res) => {
             enterprise: {
                 include: {
                     configEnterprise: true,
-                    RoleEnterprise: true,
+                    EnterpriseRoleLink: {
+                        include: {
+                            Role: true,
+                        }
+                    },
                 }
             },
         },
@@ -36,7 +40,7 @@ const verifyIsAdmin = async (id: string, res) => {
 }
 
 // route to update enterprise informations 
-api.post("/update", async ({user, body}, res) => {
+api.post("/update", async ({ user, body }, res) => {
     try {
         const {
             name,
@@ -46,7 +50,7 @@ api.post("/update", async ({user, body}, res) => {
             website
         } = body;
 
-        
+
 
         // Validate user input
         if (!(name && email && address && phone && website)) {
@@ -78,7 +82,7 @@ api.post("/update", async ({user, body}, res) => {
 });
 
 // get all specialDays of the enterprise
-api.get("/specialDays", async ({user, body}, res) => {
+api.get("/specialDays", async ({ user, body }, res) => {
     try {
 
         const adminUser = await verifyIsAdmin(user.id, res);
@@ -102,7 +106,7 @@ api.get("/specialDays", async ({user, body}, res) => {
     }
 });
 
-api.post("/users/delete", async ({user, body}, res) => {
+api.post("/users/delete", async ({ user, body }, res) => {
     try {
 
         const userFinded = await getUserFinded(user)
@@ -148,22 +152,45 @@ api.post("/users/delete", async ({user, body}, res) => {
     }
 });
 
-api.get("/specialDays/default", async ({user, body}, res) => {
+api.get("/specialDays/default", async ({ user, body }, res) => {
     try {
+        const theUser = await getUserFinded(user);
+
         // get all default specialDays
-        const specialDays = await prisma.defaultSpecialDay.findMany();
+        const specialDays = await prisma.defaultSpecialDay.findMany({
+            where: {
+                OR: [
+                    {
+                        configEnterpriseId: null,
+                    },
+                    {
+
+                        configEnterpriseId: theUser?.userEnterprise?.enterprise?.configEnterprise?.id,
+                    },
+                ],
+            },
+        });
         return res.status(200).json({ error: false, data: specialDays });
     } catch (err) {
         console.log(err);
     }
 });
 
-api.post("/config", async ({user, body}, res) => {
+api.post("/config", async ({ user, body }, res) => {
     try {
 
         const adminUser = await verifyIsAdmin(user.id, res);
 
         const { months, specialDays, time } = body;
+
+        if (!months || !specialDays || !time) {
+            return res.status(200).json({ error: true, message: "All input are required" });
+        }
+
+        if (months.start === months.end) {
+            return res.status(200).json({ error: true, message: "Le mois de début doit être différent du mois de fin" });
+        }
+
         const specialDaysIds = [];
 
         specialDays.forEach((specialDay) => {

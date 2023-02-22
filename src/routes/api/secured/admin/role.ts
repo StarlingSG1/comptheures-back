@@ -21,17 +21,27 @@ api.post("/create", async ({ user, body }, res) => {
       data: {
         label: ucwords(name),
         isAdmin: adminLevel,
-        enterpriseId: user.userEnterprise.enterpriseId,
       },
     });
 
-    // get all roleEnterprise of the user.userEnterprise.id
-    const roles = await prisma.roleEnterprise.findMany({
-        where: {
+    const role_enterprise = await prisma.enterpriseRoleLink.create({
+        data: {
             enterpriseId: user.userEnterprise.enterpriseId,
+            roleEnterpriseId: role.id,
         },
     })
 
+
+    // get all roleEnterprise of the user.userEnterprise.id
+    const roles = await prisma.enterpriseRoleLink.findMany({
+        where: {
+            enterpriseId: user.userEnterprise.enterpriseId,
+        },
+        include : {
+          Role: true,
+          Enterprise: true,
+        }
+    })
 
     return res.status(200).json({ error: false, data: roles, message: `Rôle ${ucwords(name)} créé avec succès`, role });
 

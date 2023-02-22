@@ -101,7 +101,11 @@ export async function getUserEnterprise(id: string, userEnterprise) {
                     },
                 }
             },
-            RoleEnterprise: true,
+            EnterpriseRoleLink: {
+                include : {
+                  Role : true,
+                }
+              },
             createdBy: true,
             
         },

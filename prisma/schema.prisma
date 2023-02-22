@@ -27,12 +27,14 @@ model Enterprise {
   id        String @id @default(uuid()) 
   name      String
   address   String
+  postalCode String?
+  city      String?
   email     String
   phone     String
   website   String
   configEnterprise ConfigEnterprise?
   Users     UserEnterprise[]
-  RoleEnterprise RoleEnterprise[]
+  EnterpriseRoleLink EnterpriseRoleLink[]
   createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdById String
   createdAt DateTime @default(now())
@@ -55,11 +57,20 @@ model UserEnterprise {
 
 model RoleEnterprise {
   id        String @id @default(uuid())
-  label     String @unique
+  label     String 
   isAdmin   Int  @default(0)     // 0 -> user normal | 1 -> admin | 2 -> superAdmin (comme le créateur de l'entreprise)
   userEnterprise UserEnterprise[]
-  enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
+  EnterpriseRoleLink EnterpriseRoleLink[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EnterpriseRoleLink {
+  id        String @id @default(uuid())
+  Enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
   enterpriseId String
+  Role     RoleEnterprise @relation(fields: [roleEnterpriseId], references: [id], onDelete: Cascade)
+  roleEnterpriseId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -86,7 +97,7 @@ model SpecialDay {
   configEnterpriseId String
   specialTime SpecialTime[]
   defaultSpecialDay DefaultSpecialDay? @relation(fields: [defaultSpecialDayId], references: [id], onDelete: Cascade)
-  defaultSpecialDayId String? @unique
+  defaultSpecialDayId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
