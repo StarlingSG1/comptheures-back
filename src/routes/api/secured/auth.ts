@@ -71,15 +71,15 @@ api.post("/register", async ({ body }, res) => {
       data: [
         {
           enterpriseId: newEnterprise.id,
-          roleEnterpriseId: "1",
+          roleEnterpriseId: "08c61d13-40a2-4ace-9661-5be5c677c9a8",
         },
         {
           enterpriseId: newEnterprise.id,
-          roleEnterpriseId: "2",
+          roleEnterpriseId: "5562bac0-a0e4-4546-8a0a-49e03bafe976",
         },
         {
           enterpriseId: newEnterprise.id,
-          roleEnterpriseId: "3",
+          roleEnterpriseId: "09cf4331-087a-436a-a1bd-daee673ecd11",
         },
       ],
     });

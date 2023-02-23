@@ -2,6 +2,9 @@
   "name": "comptheures-backend",
   "description": "backend in typescript/nodejs - express with authentification",
   "version": "1.0.0",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "engines": {
     "node": "14.19.0"
   },
