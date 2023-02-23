@@ -48,6 +48,7 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "stripe": "^10.10.0",
+    "ts-node": "^10.9.1",
     "yarn": "^1.22.18"
   }
 }

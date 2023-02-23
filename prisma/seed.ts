@@ -3,7 +3,6 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 async function main() {
-    // create 3 roleEnterprises
     await prisma.roleEnterprise.createMany({
         data: [
             {
@@ -21,8 +20,52 @@ async function main() {
                 label: 'Super Admin',
                 isAdmin: 2,
             },
-        ]
+        ],
+            skipDuplicates: true,
     })
+
+    await prisma.defaultSpecialDay.createMany({
+        data: [
+            {
+                id: "1",
+                name: "Congé",
+                work: false,
+                paid: true,
+            },
+            {
+                id: "2",
+                name: "Récup",
+                work: false,
+                paid: true,
+            },
+            {
+                id: "3",
+                name: "Maladie",
+                work: false,
+                paid: true,
+            },
+            {
+                id: "4",
+                name: "Sans solde",
+                work: false,
+                paid: false,
+            },
+            {
+                id: "5",
+                name: "École",
+                work: false,
+                paid: true,
+            },
+            {
+                id: "6",
+                name: "Évènement",
+                work: true,
+                paid: true,
+            },
+        ],
+            skipDuplicates: true,
+    })
+
 }
 main()
     .then(async () => {
