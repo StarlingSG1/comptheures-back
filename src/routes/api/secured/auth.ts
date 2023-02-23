@@ -190,10 +190,8 @@ api.post("/login", async (req, res) => {
       })
       
       if(user?.userEnterprise?.enterprise?.configEnterprise){
-        console.log("connexion simple")
         return res.status(200).json({user : user, toConfig : false});
       }else if(user.userEnterprise?.role?.isAdmin === 2) {
-        console.log("-> configuration de l'entreprise")
         return res.status(200).json({user : user, toConfig : true});
       } else {
         return res.status(400).json({error: true, user : user, toConfig : false});
@@ -256,10 +254,8 @@ api.post("/me", async ({ body }, res) => {
     delete user.password;
 
     if(user?.userEnterprise?.enterprise?.configEnterprise){
-      console.log("connexion simple")
       return res.status(200).json({user : user, toConfig : false});
     }else if(user.userEnterprise?.role?.isAdmin === 2) {
-      console.log("-> configuration de l'entreprise")
       return res.status(200).json({user : user, toConfig : true});
     } else {
       return res.status(400).json({error: true, user : user, toConfig : false});
