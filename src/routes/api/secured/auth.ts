@@ -194,7 +194,7 @@ api.post("/login", async (req, res) => {
       }else if(user.userEnterprise?.role?.isAdmin === 2) {
         return res.status(200).json({user : user, toConfig : true});
       } else {
-        return res.status(400).json({error: true, user : user, toConfig : false});
+        return res.status(400).json({error: true, message: "Une erreur est survenue", user : user, toConfig : false});
       }
     } else {
       return res.status(200).json({ error: true, message: "Adresse email ou mot de passe incorrect" });
