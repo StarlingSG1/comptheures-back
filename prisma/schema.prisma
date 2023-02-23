@@ -48,7 +48,7 @@ model UserEnterprise {
   userId    String @unique
   enterprise Enterprise @relation(fields: [enterpriseId], references: [id], onDelete: Cascade)
   enterpriseId String
-  role     RoleEnterprise @relation(fields: [roleEnterpriseId], references: [id], onDelete: Cascade)
+  role     RoleEnterprise @relation(fields: [roleEnterpriseId], references: [id])
   roleEnterpriseId String
   Stats    Stats[]
   createdAt DateTime @default(now())
@@ -96,7 +96,7 @@ model SpecialDay {
   configEnterprise ConfigEnterprise @relation(fields: [configEnterpriseId], references: [id])
   configEnterpriseId String
   specialTime SpecialTime[]
-  defaultSpecialDay DefaultSpecialDay? @relation(fields: [defaultSpecialDayId], references: [id], onDelete: Cascade)
+  defaultSpecialDay DefaultSpecialDay? @relation(fields: [defaultSpecialDayId], references: [id])
   defaultSpecialDayId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,7 +148,7 @@ model Stats {
   break     String? // peut etre pas utilie finalement
   realisationStatus RealisationStatus @default(IN_VALIDATION)
   CustomTime     CustomTime[]
-  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id])
+  specialTime SpecialTime? @relation(fields: [specialTimeId], references: [id], onDelete: Cascade)
   specialTimeId String? @unique
   userEnterprise UserEnterprise @relation(fields: [userEnterpriseId], references: [id], onDelete: Cascade)
   userEnterpriseId String
