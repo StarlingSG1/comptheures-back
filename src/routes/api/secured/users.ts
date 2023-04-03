@@ -40,6 +40,25 @@ api.post("/update", async (req, res) => {
         return res.status(409).send("Veillez renseigner un autre email");
       }
     }
+    const myUser = await getUserFinded(user);
+
+    if(password.old && password.new && password.confirm) {
+      if( password.old === myUser.password){
+        const encryptedPassword = await bcrypt.hash(password.new, 10);
+        await prisma.user.update({
+          where: {
+            id: myUser.id,
+          },
+          data: {
+            password: encryptedPassword,
+          },
+        });
+      } else {
+        return res.status(400).send("Votre ancien mot de passe est incorrect");
+      }
+    }
+
+
 
     const userUpdated = await prisma.user.update({
       where: {
@@ -93,22 +112,11 @@ api.post("/update", async (req, res) => {
       }
     );
 
-    if(password.old && password.new && password.confirm) {
-      // if password.old === userUpdated.password
-      const encryptedPassword = await bcrypt.hash(password.new, 10);
-      await prisma.user.update({
-        where: {
-          id: userUpdated.id,
-        },
-        data: {
-          password: encryptedPassword,
-        },
-      });
-    }
+    
 
     delete userUpdated.password;
 
-    const updatedUser = getUserFinded(userUpdated);
+    const updatedUser = await getUserFinded(userUpdated);
 
     return res.status(201).json({error: false, data: {updatedUser, newToken} ,message: "Votre compte a été mis à jour avec succès"});
   } catch (err) {
