@@ -193,7 +193,10 @@ api.post("/login", async (req, res) => {
         return res.status(200).json({user : user, toConfig : false});
       }else if(user.userEnterprise?.role?.isAdmin === 2) {
         return res.status(200).json({user : user, toConfig : true});
-      } else {
+      } else if(!user?.userEnterprise){
+        return res.status(400).json({error: true, message: "Connexion impossible, vous n'avez pas d'entreprise", toConfig : false});
+      }
+      else {
         return res.status(400).json({error: true, message: "Une erreur est survenue", user : user, toConfig : false});
       }
     } else {

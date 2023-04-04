@@ -12,7 +12,6 @@ api.post("/create", async ({ user, body }, res) => {
   try {
 
    const { name, paid, work} = body;
-   console.log(user)
    const newSpecialDay = await prisma.defaultSpecialDay.create({
         data: {
             name: ucwords(name),
