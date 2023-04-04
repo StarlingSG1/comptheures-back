@@ -37,6 +37,8 @@ export async function getUserFinded(user) {
         },
     })
 
+    
+
     return userFinded;
 }
 

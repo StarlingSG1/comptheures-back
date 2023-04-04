@@ -94,6 +94,7 @@ api.post("/recap", async (req, res) => {
         const user = req?.user;
         const date = req.body
         const userFinded = await getUserFinded(user)
+        console.log(userFinded)
 
         const range = getMonthRange(date);
         const months = [range.previous.getMonth(), range.current.getMonth(), range.next.getMonth()];

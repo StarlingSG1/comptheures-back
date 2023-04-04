@@ -1,0 +1,41 @@
+[
+    {
+        "user": {
+            "firstName": "Jérémie",
+            "lastName": "Barrière",
+            "email": "jereb@hotmail.fr"
+        },
+        "stats": [
+            {
+                "work": "02:00",
+                "date": "28/4/2023",
+                "customTime": []
+            },
+            {
+                "work": "02:00",
+                "date": "28/2/2023",
+                "customTime": []
+            },
+            {
+                "work": "02:00",
+                "date": "3/3/2023",
+                "customTime": []
+            },
+            {
+                "work": "02:00",
+                "date": "4/3/2023",
+                "customTime": []
+            },
+            {
+                "work": "8:57",
+                "date": "5/3/2023",
+                "customTime": [
+                    {
+                        "name": "Journée de travail",
+                        "time": "10:30 - 19:27"
+                    }
+                ]
+            }
+        ]
+    }
+]
