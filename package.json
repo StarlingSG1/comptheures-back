@@ -44,6 +44,7 @@
     "heroku": "^7.60.2",
     "jsonwebtoken": "^8.5.1",
     "node-mailjet": "^3.3.1",
+    "nodemailer": "^6.9.1",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

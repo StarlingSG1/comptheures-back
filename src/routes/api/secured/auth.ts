@@ -7,6 +7,7 @@ import prisma from "../../../helpers/prisma";
 import ucwords from "../../../helpers/cleaner";
 import jwt from "jsonwebtoken";
 import { getUserEnterprise, getUserFinded } from "../../../helpers/userFunctions";
+import { mailer } from "../../../middlewares/nodemailer";
 // import mailer from "../../../helpers/mailjet";
 
 const api = Router();
@@ -281,5 +282,72 @@ api.get("/" , async (req, res) => {
 
   return res.status(200).json({data : value});
 }); 
+
+
+
+// reset password function
+api.post("/reset-password", async ({ body }, res) => {
+  try {
+    const { email } = body;
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (user) {
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.TOKEN_SECRET,
+        {
+          expiresIn: "2h",
+        }
+        );
+        const url = `${process.env.LOCAL_FRONT_URL}/password/reset/${token}`;
+        await mailer(user.email,"Réinitialisation du mot de passe", url)
+      
+    }
+    return res.status(200).send({ error: false, message: "Si l'email existe, un lien de réinitialisation de mot de passe vous a été envoyé par email" });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+api.post("/reset-password/:token", async ({ params , body}, res) => {
+  try {
+    const { token } = params;
+    const { newPassword, confirmPassword } = body;
+    // try catfh jwt verify
+    let decoded = null;
+    try {
+      decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+    }catch(err){
+      return res.status(400).send("Le lien de réinitialisation de mot de passe est invalide ou a expiré");
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.id,
+      },
+    });
+    if (user) {
+      if (newPassword !== confirmPassword) {
+        return res.status(400).send("Les mots de passe ne correspondent pas");
+      }
+      const encryptedPassword = await bcrypt.hash(newPassword, 10);
+      await prisma.user.update({
+        where: {
+          id: decoded.id,
+        },
+        data: {
+          password: encryptedPassword,
+        },
+      });
+      return res.status(200).send({ error: false, message: "Votre mot de passe a bien été réinitialisé, vous pouvez essayé de vous connecter" });
+    }
+    return res.status(400).send({ error: true, message: "Le token a expiré ou est invalide" });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 
 export default api;
